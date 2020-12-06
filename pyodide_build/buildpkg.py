@@ -15,9 +15,7 @@ from urllib import request
 from datetime import datetime
 from typing import Any, Dict
 
-
 from . import common
-
 
 def check_checksum(path: Path, pkg: Dict[str, Any]):
     """
@@ -173,6 +171,34 @@ def compile(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
         fd.write(b"\n")
 
 
+
+def minify_python(buildpath: Path, srcpath: Path, pkg: Dict[str, Any], args):
+    if (srcpath / ".minified").is_file():
+        return
+    print("Minify: ",buildpath,"  ",srcpath)
+    import python_minifier
+    allPythonFiles=srcpath.rglob("*.py")
+    allPythonFiles=[]
+    for fname in allPythonFiles:
+        newName=fname.with_suffix(".ori")
+        shutil.copy(fname,newName)
+        try:
+            with newName.open() as f:            
+                print("Minify: ",str(fname))
+                source=f.read()
+                minified=python_minifier.minify(source, filename=str(fname), remove_annotations=True, remove_pass=True, remove_literal_statements=True, combine_imports=True, hoist_literals=True, rename_locals=False, preserve_locals=None, rename_globals=False, preserve_globals=None, remove_object_base=True, convert_posargs_to_args=True)
+                #print(minified)
+                fname.open(mode='w').write(minified)
+        except SyntaxError as e:
+            print("Skipping minify for ",fname)
+        except Exception as e:
+            print("Minify failed ",fname,e)
+        newName.unlink()
+    
+    with open(srcpath / ".minified", "wb") as fd:
+        fd.write(b"\n")
+    
+
 def package_files(buildpath: Path, srcpath: Path, pkg: Dict[str, Any], args):
     if (buildpath / ".packaged").is_file():
         return
@@ -184,7 +210,7 @@ def package_files(buildpath: Path, srcpath: Path, pkg: Dict[str, Any], args):
             "python",
             common.ROOTDIR / "file_packager.py",
             name + ".data",
-            "--abi={0}".format(args.package_abi),
+         #   "--abi={0}".format(args.package_abi),
             "--lz4",
             "--preload",
             "{}@/".format(install_prefix),
@@ -250,6 +276,7 @@ def build_package(path: Path, args):
             os.makedirs(buildpath)
         srcpath = download_and_extract(buildpath, packagedir, pkg, args)
         patch(path, srcpath, pkg, args)
+        minify_python(path,srcpath,pkg,args)
         compile(path, srcpath, pkg, args)
         package_files(buildpath, srcpath, pkg, args)
     finally:
@@ -313,3 +340,4 @@ if __name__ == "__main__":
     parser = make_parser(argparse.ArgumentParser())
     args = parser.parse_args()
     main(args)
+

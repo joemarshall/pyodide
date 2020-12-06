@@ -103,7 +103,7 @@ $(SQLITEBUILD)/libsqlite3.la: $(SQLITETARBALL)
 	tar -C $(ROOT)/build/ -xf $(SQLITETARBALL)
 	( \
 		cd $(SQLITEBUILD); \
-		emconfigure ./configure; \
+		emconfigure ./configure CFLAGS="-s ERROR_ON_UNDEFINED_SYMBOLS=0"; \
 		emmake make -j $${PYODIDE_JOBS:-3}; \
 	)
 
@@ -113,7 +113,7 @@ $(BZIP2BUILD)/libbz2.a: $(BZIP2TARBALL)
 	tar -C $(ROOT)/build/ -xf $(BZIP2TARBALL)
 	( \
 		cd $(BZIP2BUILD); \
-		emmake make -j $${PYODIDE_JOBS:-3} CC=emcc CFLAGS="-Wall -Winline -O2 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64" AR=emar RANLIB=emranlib libbz2.a; \
+		emmake make -j $${PYODIDE_JOBS:-3} CC=emcc CFLAGS="-fPIC -Wall -Winline -O2 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64" AR=emar RANLIB=emranlib libbz2.a; \
 	)
 
 
@@ -122,7 +122,7 @@ $(BUILD)/Makefile: $(BUILD)/.patched $(ZLIBBUILD)/.patched $(SQLITEBUILD)/libsql
 	( \
 		cd $(BUILD); \
 		CONFIG_SITE=./config.site READELF=true LD_RUN_PATH="$(SQLITEBUILD):$(BZIP2BUILD)" emconfigure \
-		  ./configure \
+		   ./configure \
 			  CPPFLAGS="-I$(SQLITEBUILD) -I$(BZIP2BUILD)" \
 			  LDFLAGS="-L$(SQLITEBUILD) -L$(BZIP2BUILD)" \
 			  --without-pymalloc \
@@ -141,7 +141,7 @@ $(BUILD)/$(LIB): $(BUILD)/Makefile $(HOSTPYTHON) $(HOSTPGEN) Setup.local
 	( \
 		cp build/$(PYVERSION)/host/lib/python$(PYMINOR)/`$(HOSTPYTHON) -c "import sysconfig; print(sysconfig._get_sysconfigdata_name())"`.py build/$(PYVERSION)/Python-$(PYVERSION)/Lib/_sysconfigdata__emscripten_.py; \
 		cd $(BUILD); \
-		emmake make HOSTPYTHON=$(HOSTPYTHON) HOSTPGEN=$(HOSTPGEN) CROSS_COMPILE=yes $(LIB) -j $${PYODIDE_JOBS:-3} \
+		emmake make HOSTPYTHON=$(HOSTPYTHON) HOSTPGEN=$(HOSTPGEN) CROSS_COMPILE=yes $(LIB) -j $${PYODIDE_JOBS:-3} SQLITEBUILD=${SQLITEBUILD} BZIP2BUILD=${BZIP2BUILD} ZLIBBUILD=${ZLIBBUILD}\
 	)
 	sed -i -e 's/\-undefined dynamic_lookup//' build/$(PYVERSION)/Python-$(PYVERSION)/Lib/_sysconfigdata__emscripten_.py
 	touch $(BUILD)/$(LIB)

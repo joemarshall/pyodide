@@ -8,17 +8,17 @@ emsdk/.complete:
 	git clone https://github.com/emscripten-core/emsdk.git
 	( \
 		cd emsdk && \
-		./emsdk install --build=Release $(EMSCRIPTEN_VERSION)-fastcomp && \
-		git clone --branch 1.38.32 --depth 1 https://github.com/WebAssembly/binaryen.git  && \
+		./emsdk install --build=Release $(EMSCRIPTEN_VERSION) && \
+#		git clone --branch "version_98" --depth 1 https://github.com/WebAssembly/binaryen.git  && \
 		cd .. && \
-		(cat patches/*.patch | patch -p1) && \
+#		 (cat patches/*.patch | patch -p1) && \
 		cd emsdk && \
-		./emsdk activate --embedded --build=Release $(EMSCRIPTEN_VERSION)-fastcomp && \
-	        cd binaryen && \
-		cmake . && make -j5 && \
-		cd ../.. && \
-		sed -i "s/BINARYEN_ROOT.*/BINARYEN_ROOT = emsdk_path \+ '\/binaryen'/g" emsdk/.emscripten && \
-		touch emsdk/.complete \
+		./emsdk activate --embedded --build=Release $(EMSCRIPTEN_VERSION) && \
+		cd .. && \
+#	        cd binaryen && \
+#		cmake . && make -j5 && \
+#		cd ../.. && \
+		touch emsdk/.complete\
 	)
 
 clean:

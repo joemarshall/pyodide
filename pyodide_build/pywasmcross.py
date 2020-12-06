@@ -235,6 +235,7 @@ def handle_command(line, args, dryrun=False):
 
     lapack_dir = None
 
+    extra_args=[]
     # Go through and adjust arguments
     for arg in line[1:]:
         if arg.startswith("-I"):
@@ -262,8 +263,13 @@ def handle_command(line, args, dryrun=False):
             arg = arg[:-2] + ".bc"
             output = arg
         elif arg.endswith(".so"):
+            # in new wasm so is called an so
             arg = arg[:-3] + ".wasm"
             output = arg
+            extra_args.append("-s")
+            extra_args.append(" SIDE_MODULE=1")
+        if arg.startswith("-shared"):
+            continue   
 
         # Fix for scipy to link to the correct BLAS/LAPACK files
         if arg.startswith("-L") and "CLAPACK-WA" in arg:
@@ -303,6 +309,8 @@ def handle_command(line, args, dryrun=False):
             continue
 
         new_args.append(arg)
+        new_args.extend(extra_args)
+        extra_args=[]
 
     # This can only be used for incremental rebuilds -- it generates
     # an error during clean build of numpy

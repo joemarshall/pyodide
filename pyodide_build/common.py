@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional, Set
 
 
-ROOTDIR = Path(__file__).parents[1].resolve() / "tools"
+ROOTDIR = Path(__file__).parents[1].resolve() / "emsdk/emsdk/upstream/emscripten/tools"
 HOSTPYTHON = ROOTDIR / ".." / "cpython" / "build" / "3.8.2" / "host"
 TARGETPYTHON = ROOTDIR / ".." / "cpython" / "installs" / "python-3.8.2"
 DEFAULTCFLAGS = ""
@@ -12,15 +12,12 @@ DEFAULTLDFLAGS = " ".join(
         "-O2",
         "-s", "BINARYEN_METHOD='native-wasm'",
         "-Werror",
-        "-s", "EMULATED_FUNCTION_POINTERS=1",
-        "-s", "EMULATE_FUNCTION_POINTER_CASTS=1",
         "-s", "SIDE_MODULE=1",
         "-s", "WASM=1",
-        "-s", "BINARYEN_TRAP_MODE='clamp'",
         "--memory-init-file", "0",
         "-s", "LINKABLE=1",
         "-s", "EXPORT_ALL=1",
-        "-s", "ERROR_ON_MISSING_LIBRARIES=0",
+#        "-s", "ERROR_ON_MISSING_LIBRARIES=0",
         "-s", "ASSERTIONS=1",
     ]
 )

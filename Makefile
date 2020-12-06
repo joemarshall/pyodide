@@ -2,7 +2,7 @@ PYODIDE_ROOT=$(abspath .)
 include Makefile.envs
 .PHONY=check
 
-FILEPACKAGER=$(PYODIDE_ROOT)/tools/file_packager.py
+FILEPACKAGER=$(PYODIDE_ROOT)/emsdk/emsdk/upstream/emscripten/tools/file_packager.py
 
 CPYTHONROOT=cpython
 CPYTHONLIB=$(CPYTHONROOT)/installs/python-$(PYVERSION)/lib/python$(PYMINOR)
@@ -21,8 +21,8 @@ SHELL := /bin/bash
 CC=emcc
 CXX=em++
 OPTFLAGS=-O2
-CFLAGS=$(OPTFLAGS) -g -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths
-CXXFLAGS=$(CFLAGS) -std=c++14
+CFLAGS=$(OPTFLAGS) -g -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths -fPIC -s LZ4=1
+CXXFLAGS=$(CFLAGS) -std=c++14 -fPIC -s LZ4=1
 
 
 LDFLAGS=\
@@ -34,13 +34,11 @@ LDFLAGS=\
 	-s TOTAL_MEMORY=10485760 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s MAIN_MODULE=1 \
-	-s EMULATED_FUNCTION_POINTERS=1 \
-	-s EMULATE_FUNCTION_POINTER_CASTS=1 \
 	-s LINKABLE=1 \
+        -s LZ4=1\
 	-s EXPORT_ALL=1 \
 	-s EXPORTED_FUNCTIONS='["___cxa_guard_acquire", "__ZNSt3__28ios_base4initEPv"]' \
 	-s WASM=1 \
-	-s SWAPPABLE_ASM_MODULE=1 \
 	-s USE_FREETYPE=1 \
 	-s USE_LIBPNG=1 \
 	-std=c++14 \
@@ -48,9 +46,7 @@ LDFLAGS=\
 	$(wildcard $(CPYTHONROOT)/build/bzip2*/libbz2.a) \
 	-lstdc++ \
 	--memory-init-file 0 \
-	-s "BINARYEN_TRAP_MODE='clamp'" \
-	-s TEXTDECODER=0 \
-	-s LZ4=1
+	-s TEXTDECODER=0 
 
 SIX_ROOT=packages/six/six-1.11.0/build/lib
 SIX_LIBS=$(SIX_ROOT)/six.py
@@ -62,9 +58,7 @@ PARSO_ROOT=packages/parso/parso-0.8.0/parso
 PARSO_LIBS=$(PARSO_ROOT)/__init__.py
 
 SITEPACKAGES=root/lib/python$(PYMINOR)/site-packages
-
-all: check \
-	build/pyodide.asm.js \
+all: 	build/pyodide.asm.js \
 	build/pyodide.asm.data \
 	build/pyodide.js \
 	build/pyodide_dev.js \
@@ -86,9 +80,9 @@ build/pyodide.asm.js: src/main.bc src/type_conversion/jsimport.bc \
 		src/type_conversion/runpython.bc src/type_conversion/hiwire.bc
 	date +"[%F %T] Building pyodide.asm.js..."
 	[ -d build ] || mkdir build
-	$(CXX) -s EXPORT_NAME="'pyodide'" -o build/pyodide.asm.html $(filter %.bc,$^) \
-		$(LDFLAGS) -s FORCE_FILESYSTEM=1
-	rm build/pyodide.asm.html
+	$(CXX) -s EXPORT_NAME="'pyodide'" -o build/pyodide.asm.js $(filter %.bc,$^) \
+		$(LDFLAGS) -s FORCE_FILESYSTEM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['LZ4'] --preload-file root/lib@lib
+#	rm build/pyodide.asm.html
 	date +"[%F %T] done building pyodide.asm.js."
 
 
@@ -96,12 +90,13 @@ env:
 	env
 
 
-build/pyodide.asm.data: root/.built
-	( \
-		cd build; \
-		python $(FILEPACKAGER) pyodide.asm.data --abi=$(PYODIDE_PACKAGE_ABI) --lz4 --preload ../root/lib@lib --js-output=pyodide.asm.data.js --use-preload-plugins \
-	)
-	uglifyjs build/pyodide.asm.data.js -o build/pyodide.asm.data.js
+#build/pyodide.asm.data: root/.built
+#	( \
+#		cd build; /
+#          emcc -o pyodide.asm.data --lz4 --preload ../root/lib@lib
+#/ #python $(FILEPACKAGER) pyodide.asm.data --lz4 --preload ../root/lib@lib --js-output=pyodide.asm.data.js --use-preload-plugins \
+#	)
+#	uglifyjs build/pyodide.asm.data.js -o build/pyodide.asm.data.js
 
 
 build/pyodide_dev.js: src/pyodide.js
@@ -183,7 +178,7 @@ build/test.data: $(CPYTHONLIB)
 	)
 	( \
 		cd build; \
-		python $(FILEPACKAGER) test.data --abi=$(PYODIDE_PACKAGE_ABI) --lz4 --preload ../$(CPYTHONLIB)/test@/lib/python3.8/test --js-output=test.js --export-name=pyodide._module --exclude __pycache__ \
+		python $(FILEPACKAGER) test.data --lz4 --preload ../$(CPYTHONLIB)/test@/lib/python3.8/test --js-output=test.js --export-name=pyodide._module --exclude __pycache__ \
 	)
 	uglifyjs build/test.js -o build/test.js
 
@@ -224,7 +219,7 @@ $(PYODIDE_EMCC):
 		if hash ccache &>/dev/null; then \
 			ln -s `which ccache` $@ ; \
 		else \
-			ln -s emsdk/emsdk/fastcomp/emscripten/emcc $@; \
+			ln -s emsdk/emsdk/upstream/emscripten/emcc $@; \
 		fi; \
 	fi
 
@@ -235,7 +230,7 @@ $(PYODIDE_CXX):
 		if hash ccache &>/dev/null; then \
 			ln -s `which ccache` $@ ; \
 		else \
-			ln -s emsdk/emsdk/fastcomp/emscripten/em++ $@; \
+			ln -s emsdk/emsdk/upstream/empscripten/em++ $@; \
 		fi; \
 	fi
 
