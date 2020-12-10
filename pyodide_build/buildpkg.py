@@ -131,6 +131,7 @@ def patch(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
 def compile(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
     if (srcpath / ".built").is_file():
         return
+    print("****************\n",args,"****************")
 
     orig_dir = Path.cwd()
     os.chdir(srcpath)
@@ -155,6 +156,8 @@ def compile(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
                 args.target,
                 "--install-dir",
                 args.install_dir,
+                "--ignore-libs",
+                pkg.get("build",{}).get("ignore-libs","")
             ],
             env=env,
             check=True,
@@ -341,10 +344,18 @@ def make_parser(parser: argparse.ArgumentParser):
             "needed if you want to build other packages that depend on this one."
         ),
     )
+    parser.add_argument(
+      "--ignore-libs",
+      type=str,
+      nargs="?",
+      default=" ",
+      help=("Libraries to ignore in final link"),
+    )
     return parser
 
 
 def main(args):
+    print(parser,args)
     path = Path(args.package[0]).resolve()
     build_package(path, args)
 
@@ -352,5 +363,6 @@ def main(args):
 if __name__ == "__main__":
     parser = make_parser(argparse.ArgumentParser())
     args = parser.parse_args()
+    print(parser,args)
     main(args)
 

@@ -118,7 +118,16 @@ def make_symlinks(env):
 def capture_compile(args):
     env = dict(os.environ)
     make_symlinks(env)
-    env["PATH"] = str(ROOTDIR) + ":" + os.environ["PATH"]
+    python_headers=str(ROOTDIR/"cpython"/"build"/"3.8.2"/"host"/"include"/"python3.8")
+
+    env["PATH"] = str(ROOTDIR) + ":" + os.environ["PATH"] 
+    print("WOOO:**************************************")
+
+    cmd = [Path(args.host) / "bin" / "python3", "-c", "import sysconfig;print(sysconfig.get_paths())"]
+    print("WOOO:**************************************")
+    result = subprocess.run(cmd, env=env)
+
+
 
     cmd = [Path(args.host) / "bin" / "python3", "setup.py", "install"]
     if args.install_dir == "skip":
@@ -203,6 +212,8 @@ def handle_command(line, args, dryrun=False):
     emcc test.c
     ['emcc', 'test.c']
     """
+    print("***************",args)
+
     # This is a special case to skip the compilation tests in numpy that aren't
     # actually part of the build
     for arg in line:
@@ -254,6 +265,15 @@ def handle_command(line, args, dryrun=False):
         # Don't include any system directories
         if arg.startswith("-L/usr"):
             continue
+        #ignore libraries
+        skipLib=False
+        for l in args.ignore_libs.strip().split(";"):
+          print(l,"!!!")
+          print(arg)
+          if arg.startswith("-l"+l):
+            skipLib=True
+        if skipLib:
+          continue
         # threading is disabled for now
         if arg == "-pthread":
             continue
@@ -440,6 +460,13 @@ def make_parser(parser):
                 "default. Set to 'skip' to skip installation. Installation is "
                 "needed if you want to build other packages that depend on this one."
             ),
+        )
+        parser.add_argument(
+            "--ignore-libs",
+            type=str,
+            nargs="?",
+            default="",
+            help="Libraries to ignore in final link",
         )
     return parser
 

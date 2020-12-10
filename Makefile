@@ -46,8 +46,8 @@ LDFLAGS=\
 	$(wildcard $(CPYTHONROOT)/build/bzip2*/libbz2.a) \
 	-lstdc++ \
 	--memory-init-file 0 \
-        -s EXTRA_EXPORTED_RUNTIME_METHODS=['LZ4']
-        -s FORCE_FILESYSTEM=1
+	-s EXTRA_EXPORTED_RUNTIME_METHODS=['LZ4']\
+	-s FORCE_FILESYSTEM=1\
 	-s TEXTDECODER=0 
 
 SIX_ROOT=packages/six/six-1.11.0/build/lib
