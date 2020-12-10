@@ -1,6 +1,6 @@
-diff -ur CLAPACK-WA/BLAS/SRC/Makefile CLAPACK-WA-WORKING/BLAS/SRC/Makefile
---- CLAPACK-WA/BLAS/SRC/Makefile	2020-12-10 15:21:08.431816700 +0000
-+++ CLAPACK-WA-WORKING/BLAS/SRC/Makefile	2020-12-10 15:20:50.581816700 +0000
+diff -ur ./BLAS/SRC/Makefile ../CLAPACK-WA-WORKING/BLAS/SRC/Makefile
+--- ./BLAS/SRC/Makefile	2020-12-10 16:06:12.691816700 +0000
++++ ../CLAPACK-WA-WORKING/BLAS/SRC/Makefile	2020-12-10 15:20:50.581816700 +0000
 @@ -139,7 +139,8 @@
  	$(ZBLAS2) $(ZBLAS3) $(ALLBLAS)
  
@@ -11,9 +11,9 @@ diff -ur CLAPACK-WA/BLAS/SRC/Makefile CLAPACK-WA-WORKING/BLAS/SRC/Makefile
  
  single: $(SBLAS1) $(ALLBLAS) $(SBLAS2) $(SBLAS3)
  	$(ARCH) $(ARCHFLAGS) $(BLASLIB) $(SBLAS1) $(ALLBLAS) \
-diff -ur CLAPACK-WA/BLAS/WRAP/Makefile CLAPACK-WA-WORKING/BLAS/WRAP/Makefile
---- CLAPACK-WA/BLAS/WRAP/Makefile	2020-12-10 15:21:08.431816700 +0000
-+++ CLAPACK-WA-WORKING/BLAS/WRAP/Makefile	2020-12-10 15:20:50.581816700 +0000
+diff -ur ./BLAS/WRAP/Makefile ../CLAPACK-WA-WORKING/BLAS/WRAP/Makefile
+--- ./BLAS/WRAP/Makefile	2020-12-10 16:06:12.691816700 +0000
++++ ../CLAPACK-WA-WORKING/BLAS/WRAP/Makefile	2020-12-10 15:20:50.581816700 +0000
 @@ -5,10 +5,11 @@
  #  This is the makefile to create a wrapper for the CBLAS.
  #######################################################################
@@ -29,9 +29,9 @@ diff -ur CLAPACK-WA/BLAS/WRAP/Makefile CLAPACK-WA-WORKING/BLAS/WRAP/Makefile
  
  libfblaswr.a: fblaswr.o
  	$(ARCH) $(ARCHFLAGS) libfblaswr.a fblaswr.o
-diff -ur CLAPACK-WA/F2CLIBS/libf2c/Makefile CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile
---- CLAPACK-WA/F2CLIBS/libf2c/Makefile	2020-12-10 15:21:08.431816700 +0000
-+++ CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile	2020-12-10 15:20:50.651816700 +0000
+diff -ur ./F2CLIBS/libf2c/Makefile ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile
+--- ./F2CLIBS/libf2c/Makefile	2020-12-10 16:06:12.691816700 +0000
++++ ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile	2020-12-10 15:20:50.651816700 +0000
 @@ -68,10 +68,12 @@
  OFILES = $(MISC) $(POW) $(CX) $(DCX) $(REAL) $(DBL) $(INT) \
  	$(HALF) $(CMP) $(EFL) $(CHAR) $(I77) $(TIME)
@@ -68,9 +68,9 @@ diff -ur CLAPACK-WA/F2CLIBS/libf2c/Makefile CLAPACK-WA-WORKING/F2CLIBS/libf2c/Ma
  
  backspac.o:	fio.h
  close.o:	fio.h
-diff -ur CLAPACK-WA/Makefile CLAPACK-WA-WORKING/Makefile
---- CLAPACK-WA/Makefile	2020-12-10 15:21:08.441816700 +0000
-+++ CLAPACK-WA-WORKING/Makefile	2020-12-10 15:20:50.701816700 +0000
+diff -ur ./Makefile ../CLAPACK-WA-WORKING/Makefile
+--- ./Makefile	2020-12-10 16:06:12.701816700 +0000
++++ ../CLAPACK-WA-WORKING/Makefile	2020-12-10 15:20:50.701816700 +0000
 @@ -32,7 +32,7 @@
  	( cd BLAS/SRC; $(MAKE) )
  
@@ -86,10 +86,20 @@ diff -ur CLAPACK-WA/Makefile CLAPACK-WA-WORKING/Makefile
  cleanall: cleanlib cleanblas_testing cleantesting 
 -	rm -f *.bc TESTING/*.out INSTALL/test*  BLAS/*.out
 +	rm -f *.a TESTING/*.out INSTALL/test*  BLAS/*.out
-diff -ur CLAPACK-WA/SRC/Makefile CLAPACK-WA-WORKING/SRC/Makefile
---- CLAPACK-WA/SRC/Makefile	2020-12-10 15:21:08.441816700 +0000
-+++ CLAPACK-WA-WORKING/SRC/Makefile	2020-12-10 15:20:50.651816700 +0000
-@@ -423,7 +423,7 @@
+diff -ur ./SRC/Makefile ../CLAPACK-WA-WORKING/SRC/Makefile
+--- ./SRC/Makefile	2020-12-10 16:06:12.701816700 +0000
++++ ../CLAPACK-WA-WORKING/SRC/Makefile	2020-12-10 16:05:29.631816700 +0000
+@@ -379,7 +379,8 @@
+ 	$(ALLAUX)
+ 
+ ../$(LAPACKLIB): $(ALLOBJ) $(ALLXOBJ)
+-	$(CC) $(CFLAGS) -o $@ $(ALLOBJ) $(ALLXOBJ)
++	$(ARCH) $(ARCHFLAGS) $@ $(ALLOBJ) $(ALLXOBJ)
++	$(RANLIB) $@
+ 
+ single: $(SLASRC) $(ALLAUX) $(SCLAUX) 
+ 	$(ARCH) $(ARCHFLAGS) ../$(LAPACKLIB) $(SLASRC) $(ALLAUX) \
+@@ -423,7 +424,7 @@
  	rm -f *.o
  
  .c.o: 
@@ -98,9 +108,9 @@ diff -ur CLAPACK-WA/SRC/Makefile CLAPACK-WA-WORKING/SRC/Makefile
  
  slaruv.o: slaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
  dlaruv.o: dlaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
-diff -ur CLAPACK-WA/make.inc CLAPACK-WA-WORKING/make.inc
---- CLAPACK-WA/make.inc	2020-12-10 15:21:08.441816700 +0000
-+++ CLAPACK-WA-WORKING/make.inc	2020-12-10 15:20:50.581816700 +0000
+diff -ur ./make.inc ../CLAPACK-WA-WORKING/make.inc
+--- ./make.inc	2020-12-10 16:06:12.701816700 +0000
++++ ../CLAPACK-WA-WORKING/make.inc	2020-12-10 15:20:50.581816700 +0000
 @@ -26,6 +26,7 @@
  #CC        = gcc  # inherit $CC from emmake
  # if no wrapping of the blas library is needed, uncomment next line
