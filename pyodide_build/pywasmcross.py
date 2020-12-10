@@ -279,7 +279,7 @@ def handle_command(line, args, dryrun=False):
         # definitely isn't
         arg = re.sub(r"/python([0-9]\.[0-9]+)m", r"/python\1", arg)
         if arg.endswith(".o"):
-            arg = arg[:-2] + ".bc"
+            arg = arg[:-2] + ".o"
             output = arg
         elif arg.endswith(".so"):
             # in new wasm so is called an so
@@ -300,7 +300,7 @@ def handle_command(line, args, dryrun=False):
             lapack_dir = arg.replace("-L", "")
             # For convinience we determine needed scipy link libraries
             # here, instead of in patch files
-            link_libs = ["F2CLIBS/libf2c.bc", "blas_WA.bc"]
+            link_libs = ["F2CLIBS/libf2c.a", "blas_WA.a"]
             if module_name in [
                 "_flapack",
                 "_flinalg",
@@ -309,7 +309,7 @@ def handle_command(line, args, dryrun=False):
                 "_iterative",
                 "_arpack",
             ]:
-                link_libs.append("lapack_WA.bc")
+                link_libs.append("lapack_WA.a")
 
             for lib_name in link_libs:
                 arg = os.path.join(lapack_dir, f"{lib_name}")
