@@ -121,10 +121,8 @@ def capture_compile(args):
     python_headers=str(ROOTDIR/"cpython"/"build"/"3.8.2"/"host"/"include"/"python3.8")
 
     env["PATH"] = str(ROOTDIR) + ":" + os.environ["PATH"] 
-    print("WOOO:**************************************")
 
     cmd = [Path(args.host) / "bin" / "python3", "-c", "import sysconfig;print(sysconfig.get_paths())"]
-    print("WOOO:**************************************")
     result = subprocess.run(cmd, env=env)
 
 
@@ -212,7 +210,6 @@ def handle_command(line, args, dryrun=False):
     emcc test.c
     ['emcc', 'test.c']
     """
-    print("***************",args)
 
     # This is a special case to skip the compilation tests in numpy that aren't
     # actually part of the build
@@ -268,8 +265,6 @@ def handle_command(line, args, dryrun=False):
         #ignore libraries
         skipLib=False
         for l in args.ignore_libs.strip().split(";"):
-          print(l,"!!!")
-          print(arg)
           if arg.startswith("-l"+l):
             skipLib=True
         if skipLib:
@@ -342,7 +337,6 @@ def handle_command(line, args, dryrun=False):
     #     print('SKIPPING: ' + ' '.join(new_args))
     #     return
 
-    print(" ".join(new_args))
 
     if not dryrun:
         result = subprocess.run(new_args)
