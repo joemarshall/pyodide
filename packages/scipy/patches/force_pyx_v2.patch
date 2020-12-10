@@ -1,0 +1,11 @@
+diff -ur ../scipy-0.17.1/tools/cythonize.py ./tools/cythonize.py
+--- ../scipy-0.17.1/tools/cythonize.py	2016-05-12 10:53:48.000000000 +0000
++++ ./tools/cythonize.py	2020-12-10 15:44:23.231816700 +0000
+@@ -63,6 +63,7 @@
+     flags = ['--fast-fail']
+     if tofile.endswith('.cxx'):
+         flags += ['--cplus']
++    flags+= ['-2']
+ 
+     try:
+         try:

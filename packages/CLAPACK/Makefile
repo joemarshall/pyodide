@@ -10,6 +10,8 @@ SRC=$(ROOT)/CLAPACK-WA
 
 all: $(SRC)/lapack_WA.a
 
+makefile: $(SRC)/Makefile
+
 clean:
 	rm -rf CLAPACK-WA
 
