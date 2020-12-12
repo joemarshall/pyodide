@@ -77,7 +77,7 @@ function loadPyodideMain(resolve,reject)
         if (entry.endsWith('.so')) {
           if (Module['preloadedWasm'][path] === undefined) {
             promise = promise
-              .then(() => Module['loadWebAssemblyModule'](
+              .then(() => Module['loadSideModule'](
                 FS.readFile(path), {loadAsync: true}))
               .then((module) => {
                 Module['preloadedWasm'][path] = module;

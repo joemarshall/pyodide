@@ -282,7 +282,7 @@ def handle_command(line, args, dryrun=False):
             arg = arg[:-2] + ".o"
             output = arg
         elif arg.endswith(".so"):
-            # in new wasm so is called an so
+            # so is exported as a wasm
             arg = arg[:-3] + ".wasm"
             output = arg
             extra_args.append("-s")

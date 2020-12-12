@@ -1,5 +1,8 @@
+
+
 PYODIDE_ROOT=$(abspath ..)
-include ../Makefile.envs
+
+include $(PYODIDE_ROOT)/Makefile.envs
 
 ROOT=$(abspath .)
 
@@ -8,7 +11,6 @@ HOSTBUILD=$(HOSTINSTALL)/Python-$(PYVERSION)
 HOSTPYTHON=$(HOSTINSTALL)/bin/python3$(EXE)
 HOSTPYTHON_CPPFLAGS="-I/usr/local/opt/openssl/include"
 HOSTPYTHON_LDFLAGS="-L/usr/local/opt/openssl/lib"
-HOSTPGEN=$(HOSTINSTALL)/bin/pgen$(EXE)
 
 BUILD=$(ROOT)/build/$(PYVERSION)/Python-$(PYVERSION)
 INSTALL=$(ROOT)/installs/python-$(PYVERSION)
@@ -31,6 +33,7 @@ BZIP2BUILD=$(ROOT)/build/bzip2-1.0.2
 BZIP2URL=ftp://sources.redhat.com/pub/bzip2/v102/bzip2-1.0.2.tar.gz
 
 
+
 all: $(INSTALL)/lib/$(LIB) $(INSTALL)/bin/python
 
 $(INSTALL)/bin/python: $(BUILD)/$(LIB)
@@ -40,12 +43,14 @@ $(INSTALL)/bin/python: $(BUILD)/$(LIB)
 	)
 $(INSTALL)/lib/$(LIB): $(BUILD)/$(LIB)
 	( \
+		mkdir -p $(INSTALL)/bin;\
+		mkdir -p $(INSTALL)/lib;\
 		cd $(BUILD); \
 		sed -i -e 's/libinstall:.*/libinstall:/' Makefile; \
 		sed -i -e 's/BUILDEXE=/BUILDEXE=.wasm/' Makefile; \
 		touch $(BUILD)/$(LIB) ; \
 		touch $(BUILD)/$(BIN).wasm ; \
-		emmake make HOSTPYTHON=$(HOSTPYTHON) PYTHON_FOR_BUILD=$(HOSTPYTHON) CROSS_COMPILE=yes inclinstall python-config install libinstall $(LIB) -j $${PYODIDE_JOBS:-3} && \
+		emmake make HOSTPYTHON=$(HOSTPYTHON) PYTHON_FOR_BUILD=$(HOSTPYTHON) CROSS_COMPILE=yes inclinstall libinstall $(LIB) -j $${PYODIDE_JOBS:-3} && \
 		cp $(LIB) $(INSTALL)/lib/ && \
 		cp $(BIN).wasm $(INSTALL)/bin/ && \
 		cp $(HOSTINSTALL)/lib/python$(PYMINOR)/`$(HOSTPYTHON) -c "import sysconfig; print(sysconfig._get_sysconfigdata_name())"`.py $(INSTALL)/lib/python$(PYMINOR)/_sysconfigdata__emscripten_.py; \
@@ -80,7 +85,7 @@ $(BZIP2TARBALL):
 	wget -q -O $@ $(BZIP2URL)
 
 
-$(HOSTPYTHON) $(HOSTPGEN): $(TARBALL)
+$(HOSTPYTHON): $(TARBALL)
 	mkdir -p $(HOSTINSTALL)
 	[ -d $(HOSTBUILD) ] || tar -C $(HOSTINSTALL) -xf $(TARBALL)
 	( \
@@ -110,8 +115,8 @@ $(SQLITEBUILD)/libsqlite3.la: $(SQLITETARBALL)
 	tar -C $(ROOT)/build/ -xf $(SQLITETARBALL)
 	( \
 		cd $(SQLITEBUILD); \
-		emconfigure ./configure CFLAGS="-s ERROR_ON_UNDEFINED_SYMBOLS=0"; \
-		emmake make -j $${PYODIDE_JOBS:-3}; \
+		emconfigure ./configure CFLAGS="$(EMMAKEN_CFLAGS) -s ERROR_ON_UNDEFINED_SYMBOLS=0"; \
+		emmake make  -j $${PYODIDE_JOBS:-3}; \
 	)
 
 
@@ -120,7 +125,7 @@ $(BZIP2BUILD)/libbz2.a: $(BZIP2TARBALL)
 	tar -C $(ROOT)/build/ -xf $(BZIP2TARBALL)
 	( \
 		cd $(BZIP2BUILD); \
-		emmake make -j $${PYODIDE_JOBS:-3} CC=emcc CFLAGS="-fPIC -Wall -Winline -O2 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64" AR=emar RANLIB=emranlib libbz2.a; \
+		emmake make -j  $${PYODIDE_JOBS:-3} CC=emcc CFLAGS="$(EMMAKEN_CFLAGS) -Wall -Winline -O2 -fomit-frame-pointer -D_FILE_OFFSET_BITS=64" AR=emar RANLIB=emranlib libbz2.a; \
 	)
 
 
@@ -129,26 +134,26 @@ $(BUILD)/Makefile: $(BUILD)/.patched $(ZLIBBUILD)/.patched $(SQLITEBUILD)/libsql
 	( \
 		cd $(BUILD); \
 		CONFIG_SITE=./config.site READELF=true LD_RUN_PATH="$(SQLITEBUILD):$(BZIP2BUILD)" emconfigure \
-		   ./configure \
-			  CPPFLAGS="-I$(SQLITEBUILD) -I$(BZIP2BUILD)" \
-			  LDFLAGS="-L$(SQLITEBUILD) -L$(BZIP2BUILD) -lbz2 -lsqlite3" \
+		   ./configure CFLAGS="$(EMMAKEN_CFLAGS)"\
 			  --without-pymalloc \
 			  --disable-shared \
 			  --disable-ipv6 \
 			  --without-gcc \
 			  --host=asmjs-unknown-emscripten \
-			  --build=$(shell $(BUILD)/config.guess) \
+			  --build=wasm32 \
 			  --prefix=$(INSTALL) ; \
 	)
 
 
-$(BUILD)/$(LIB): $(BUILD)/Makefile $(HOSTPYTHON) $(HOSTPGEN) Setup.local
+$(BUILD)/$(LIB): $(BUILD)/Makefile $(HOSTPYTHON) Setup.local
 	cp Setup.local $(BUILD)/Modules/
 	cat pyconfig.undefs.h >> $(BUILD)/pyconfig.h
 	( \
 		cp build/$(PYVERSION)/host/lib/python$(PYMINOR)/`$(HOSTPYTHON) -c "import sysconfig; print(sysconfig._get_sysconfigdata_name())"`.py build/$(PYVERSION)/Python-$(PYVERSION)/Lib/_sysconfigdata__emscripten_.py; \
 		cd $(BUILD); \
-		emmake make HOSTPYTHON=$(HOSTPYTHON) HOSTPGEN=$(HOSTPGEN) CROSS_COMPILE=yes $(LIB) -j $${PYODIDE_JOBS:-3} SQLITEBUILD=${SQLITEBUILD} BZIP2BUILD=${BZIP2BUILD} ZLIBBUILD=${ZLIBBUILD}\
+		emmake make HOSTPYTHON=$(HOSTPYTHON) CROSS_COMPILE=yes $(LIB) -j $${PYODIDE_JOBS:-3} SQLITEBUILD=${SQLITEBUILD} BZIP2BUILD=${BZIP2BUILD} ZLIBBUILD=${ZLIBBUILD}\
 	)
-	sed -i -e 's/\-undefined dynamic_lookup//' build/$(PYVERSION)/Python-$(PYVERSION)/Lib/_sysconfigdata__emscripten_.py
+	sed -i -e 's/\-undefined dynamic_lookup//' build/$(PYVERSION)/Python-$(PYVERSION)/Lib/_sysconfigdata__emscripten_.py;
 	touch $(BUILD)/$(LIB)
+	mkdir -p $(INSTALL)/lib
+	cp $(BUILD)/$(LIB) $(INSTALL)/$(LIB)

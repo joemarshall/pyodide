@@ -32,5 +32,5 @@ $(SRC)/Makefile: $(TARBALL)
 $(SRC)/lib/liblz4.a: $(SRC)/Makefile
 	( \
 		cd $(SRC) ; \
-		emmake make -j $${PYODIDE_JOBS:-3} ; \
+		emmake make CFLAGS="-sEMULATE_FUNCTION_POINTER_CASTS=1 -fPIC" -j $${PYODIDE_JOBS:-3} ; \
 	)

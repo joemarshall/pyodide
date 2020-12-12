@@ -17,6 +17,7 @@ DEFAULTLDFLAGS = " ".join(
         "--memory-init-file", "0",
         "-s", "LINKABLE=1",
         "-s", "EXPORT_ALL=1",
+        "-s",EMULATE_FUNCTION_POINTER_CASTS=1
 #        "-s", "ERROR_ON_MISSING_LIBRARIES=0",
     ]
 )

@@ -229,10 +229,10 @@ def package_files(buildpath: Path, srcpath: Path, pkg: Dict[str, Any], args):
         cwd=buildpath,
         check=True,
     )
-    subprocess.run(
-        ["uglifyjs", buildpath / (name + ".js"), "-o", buildpath / (name + ".js")],
-        check=True,
-    )
+#    subprocess.run(
+#        ["uglifyjs", buildpath / (name + ".js"), "-o", buildpath / (name + ".js")],
+#        check=True,
+#    )
 
     with open(buildpath / ".packaged", "wb") as fd:
         fd.write(b"\n")

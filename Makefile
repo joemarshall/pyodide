@@ -12,7 +12,7 @@ LIBXSLT=packages/libxslt/libxslt-1.1.33/libxslt/.libs/libxslt.a
 LIBICONV=packages/libiconv/libiconv-1.16/lib/.libs/libiconv.a
 ZLIB=packages/zlib/zlib-1.2.11/lib/libz.a
 LZ4LIB=packages/lz4/lz4-1.8.3/lib/liblz4.a
-CLAPACK=packages/CLAPACK/CLAPACK-WA/lapack_WA.bc
+CLAPACK=packages/CLAPACK/CLAPACK-WA/lapack_WA.a
 
 PYODIDE_EMCC=$(PYODIDE_ROOT)/ccache/emcc
 PYODIDE_CXX=$(PYODIDE_ROOT)/ccache/em++
@@ -21,7 +21,7 @@ SHELL := /bin/bash
 CC=emcc
 CXX=em++
 OPTFLAGS=-O2
-CFLAGS=$(OPTFLAGS) -g -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths -fPIC -s LZ4=1
+CFLAGS=$(OPTFLAGS) -g4 -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths -fPIC -s LZ4=1
 CXXFLAGS=$(CFLAGS) -std=c++14 -fPIC -s LZ4=1
 
 
@@ -37,7 +37,7 @@ LDFLAGS=\
 	-s LINKABLE=1 \
         -s LZ4=1\
 	-s EXPORT_ALL=1 \
-	-s EXPORTED_FUNCTIONS='["___cxa_guard_acquire", "__ZNSt3__28ios_base4initEPv"]' \
+	-s EXPORTED_FUNCTIONS='["___cxa_guard_acquire", "__ZNSt3__28ios_base4initEPv","_main"]' \
 	-s WASM=1 \
 	-s USE_FREETYPE=1 \
 	-s USE_LIBPNG=1 \
@@ -48,7 +48,8 @@ LDFLAGS=\
 	--memory-init-file 0 \
 	-s EXTRA_EXPORTED_RUNTIME_METHODS=['LZ4']\
 	-s FORCE_FILESYSTEM=1\
-	-s TEXTDECODER=0 
+	-s TEXTDECODER=0\
+	-s EMULATE_FUNCTION_POINTER_CASTS=1
 
 SIX_ROOT=packages/six/six-1.11.0/build/lib
 SIX_LIBS=$(SIX_ROOT)/six.py
@@ -74,15 +75,15 @@ all: 	build/pyodide.asm.js \
 	echo -e "\nSUCCESS!"
 
 
-build/pyodide.asm.js: src/main.bc src/type_conversion/jsimport.bc \
-	        src/type_conversion/jsproxy.bc src/type_conversion/js2python.bc \
-		src/type_conversion/pyimport.bc src/type_conversion/pyproxy.bc \
-		src/type_conversion/python2js.bc \
-		src/type_conversion/python2js_buffer.bc \
-		src/type_conversion/runpython.bc src/type_conversion/hiwire.bc
+build/pyodide.asm.js: src/main.o src/type_conversion/jsimport.o \
+	        src/type_conversion/jsproxy.o src/type_conversion/js2python.o \
+		src/type_conversion/pyimport.o src/type_conversion/pyproxy.o \
+		src/type_conversion/python2js.o \
+		src/type_conversion/python2js_buffer.o \
+		src/type_conversion/runpython.o src/type_conversion/hiwire.o
 	date +"[%F %T] Building pyodide.asm.js..."
 	[ -d build ] || mkdir build
-	$(CXX) -s EXPORT_NAME="'pyodide'" -o build/pyodide.asm.js $(filter %.bc,$^) \
+	$(CXX) -s EXPORT_NAME="'pyodide'" -o build/pyodide.asm.js $(filter %.o,$^) -g4 \
 		$(LDFLAGS) -s FORCE_FILESYSTEM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['LZ4'] --preload-file root/lib@lib
 #	rm build/pyodide.asm.html
 	date +"[%F %T] done building pyodide.asm.js."
@@ -169,7 +170,7 @@ clean-all: clean
 	make -C cpython clean
 	rm -fr cpython/build
 
-%.bc: %.c $(CPYTHONLIB) $(LZ4LIB)
+%.o: %.c $(CPYTHONLIB) $(LZ4LIB)
 	$(CC) -o $@ -c $< $(CFLAGS) -Isrc/type_conversion/
 
 

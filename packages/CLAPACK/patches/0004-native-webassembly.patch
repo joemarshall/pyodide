@@ -1,6 +1,6 @@
-diff -ur ./BLAS/SRC/Makefile ../CLAPACK-WA-WORKING/BLAS/SRC/Makefile
---- ./BLAS/SRC/Makefile	2020-12-10 16:06:12.691816700 +0000
-+++ ../CLAPACK-WA-WORKING/BLAS/SRC/Makefile	2020-12-10 15:20:50.581816700 +0000
+diff -ur ../CLAPACK-WA/BLAS/SRC/Makefile ./BLAS/SRC/Makefile
+--- ../CLAPACK-WA/BLAS/SRC/Makefile	2020-12-10 17:22:07.801816700 +0000
++++ ./BLAS/SRC/Makefile	2020-12-10 15:20:50.581816700 +0000
 @@ -139,7 +139,8 @@
  	$(ZBLAS2) $(ZBLAS3) $(ALLBLAS)
  
@@ -11,9 +11,9 @@ diff -ur ./BLAS/SRC/Makefile ../CLAPACK-WA-WORKING/BLAS/SRC/Makefile
  
  single: $(SBLAS1) $(ALLBLAS) $(SBLAS2) $(SBLAS3)
  	$(ARCH) $(ARCHFLAGS) $(BLASLIB) $(SBLAS1) $(ALLBLAS) \
-diff -ur ./BLAS/WRAP/Makefile ../CLAPACK-WA-WORKING/BLAS/WRAP/Makefile
---- ./BLAS/WRAP/Makefile	2020-12-10 16:06:12.691816700 +0000
-+++ ../CLAPACK-WA-WORKING/BLAS/WRAP/Makefile	2020-12-10 15:20:50.581816700 +0000
+diff -ur ../CLAPACK-WA/BLAS/WRAP/Makefile ./BLAS/WRAP/Makefile
+--- ../CLAPACK-WA/BLAS/WRAP/Makefile	2020-12-10 17:22:07.791816700 +0000
++++ ./BLAS/WRAP/Makefile	2020-12-10 15:20:50.581816700 +0000
 @@ -5,10 +5,11 @@
  #  This is the makefile to create a wrapper for the CBLAS.
  #######################################################################
@@ -29,9 +29,9 @@ diff -ur ./BLAS/WRAP/Makefile ../CLAPACK-WA-WORKING/BLAS/WRAP/Makefile
  
  libfblaswr.a: fblaswr.o
  	$(ARCH) $(ARCHFLAGS) libfblaswr.a fblaswr.o
-diff -ur ./F2CLIBS/libf2c/Makefile ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile
---- ./F2CLIBS/libf2c/Makefile	2020-12-10 16:06:12.691816700 +0000
-+++ ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile	2020-12-10 15:20:50.651816700 +0000
+diff -ur ../CLAPACK-WA/F2CLIBS/libf2c/Makefile ./F2CLIBS/libf2c/Makefile
+--- ../CLAPACK-WA/F2CLIBS/libf2c/Makefile	2020-12-10 17:22:07.791816700 +0000
++++ ./F2CLIBS/libf2c/Makefile	2020-12-10 16:45:33.981816700 +0000
 @@ -68,10 +68,12 @@
  OFILES = $(MISC) $(POW) $(CX) $(DCX) $(REAL) $(DBL) $(INT) \
  	$(HALF) $(CMP) $(EFL) $(CHAR) $(I77) $(TIME)
@@ -40,7 +40,7 @@ diff -ur ./F2CLIBS/libf2c/Makefile ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile
 +all: f2c.h signal1.h sysdep1.h libf2c.a clapack_install
 +
 +libf2c.a: $(OFILES)
-+	$(AR) -r libf2c.a $?
++	$(ARCH) $(ARCHFLAGS) libf2c.a $?
 +	$(RANLIB) libf2c.a
  
 -libf2c.bc: $(OFILES)
@@ -68,9 +68,9 @@ diff -ur ./F2CLIBS/libf2c/Makefile ../CLAPACK-WA-WORKING/F2CLIBS/libf2c/Makefile
  
  backspac.o:	fio.h
  close.o:	fio.h
-diff -ur ./Makefile ../CLAPACK-WA-WORKING/Makefile
---- ./Makefile	2020-12-10 16:06:12.701816700 +0000
-+++ ../CLAPACK-WA-WORKING/Makefile	2020-12-10 15:20:50.701816700 +0000
+diff -ur ../CLAPACK-WA/Makefile ./Makefile
+--- ../CLAPACK-WA/Makefile	2020-12-10 17:22:07.801816700 +0000
++++ ./Makefile	2020-12-10 15:20:50.701816700 +0000
 @@ -32,7 +32,7 @@
  	( cd BLAS/SRC; $(MAKE) )
  
@@ -86,9 +86,9 @@ diff -ur ./Makefile ../CLAPACK-WA-WORKING/Makefile
  cleanall: cleanlib cleanblas_testing cleantesting 
 -	rm -f *.bc TESTING/*.out INSTALL/test*  BLAS/*.out
 +	rm -f *.a TESTING/*.out INSTALL/test*  BLAS/*.out
-diff -ur ./SRC/Makefile ../CLAPACK-WA-WORKING/SRC/Makefile
---- ./SRC/Makefile	2020-12-10 16:06:12.701816700 +0000
-+++ ../CLAPACK-WA-WORKING/SRC/Makefile	2020-12-10 16:05:29.631816700 +0000
+diff -ur ../CLAPACK-WA/SRC/Makefile ./SRC/Makefile
+--- ../CLAPACK-WA/SRC/Makefile	2020-12-10 17:22:07.801816700 +0000
++++ ./SRC/Makefile	2020-12-10 16:05:29.631816700 +0000
 @@ -379,7 +379,8 @@
  	$(ALLAUX)
  
@@ -108,18 +108,32 @@ diff -ur ./SRC/Makefile ../CLAPACK-WA-WORKING/SRC/Makefile
  
  slaruv.o: slaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
  dlaruv.o: dlaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
-diff -ur ./make.inc ../CLAPACK-WA-WORKING/make.inc
---- ./make.inc	2020-12-10 16:06:12.701816700 +0000
-+++ ../CLAPACK-WA-WORKING/make.inc	2020-12-10 15:20:50.581816700 +0000
-@@ -26,6 +26,7 @@
+diff -ur ../CLAPACK-WA/make.inc ./make.inc
+--- ../CLAPACK-WA/make.inc	2020-12-10 17:22:07.801816700 +0000
++++ ./make.inc	2020-12-10 17:21:21.671816700 +0000
+@@ -26,9 +26,10 @@
  #CC        = gcc  # inherit $CC from emmake
  # if no wrapping of the blas library is needed, uncomment next line
  #CC        = gcc -DNO_BLAS_WRAP
-+CFLAGS    = -I$(TOPDIR)/INCLUDE
++CFLAGS    = -I$(TOPDIR)/INCLUDE -fPIC -O3
  LOADER    = $(CC)
  LOADOPTS  =
- NOOPT     = -O0 -I$(TOPDIR)/INCLUDE
-@@ -56,7 +57,7 @@
+-NOOPT     = -O0 -I$(TOPDIR)/INCLUDE
++NOOPT     = -O0 -I$(TOPDIR)/INCLUDE -fPIC
+ #######################################################################
+ #
+ # Timer for the SECOND and DSECND routines
+@@ -48,15 +49,15 @@
+ #  The archiver and the flag(s) to use when building archive (library)
+ #  If you system has no ranlib, set RANLIB = echo.
+ #
+-ARCH     = ar
++ARCH     = emar
+ ARCHFLAGS= cr
+-RANLIB   = ranlib
++RANLIB   = emranlib
+ #
+ #  The location of BLAS library for linking the testing programs.
  #  The target's machine-specific, optimized BLAS library should be
  #  used whenever possible.
  #
