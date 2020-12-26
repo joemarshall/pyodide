@@ -1,7 +1,7 @@
 diff --git a/src/passes/FuncCastEmulation.cpp b/src/passes/FuncCastEmulation.cpp
 index 9d232c9..35d6d68 100644
---- a/binaryen/src/passes/FuncCastEmulation.cpp
-+++ b/binaryen/src/passes/FuncCastEmulation.cpp
+--- a/emsdk/binaryen/src/passes/FuncCastEmulation.cpp
++++ b/emsdk/binaryen/src/passes/FuncCastEmulation.cpp
 @@ -167,13 +167,14 @@ private:
  struct FuncCastEmulation : public Pass {
    void run(PassRunner* runner, Module* module) override {
