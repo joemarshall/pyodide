@@ -137,6 +137,9 @@ def compile(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
     env = dict(os.environ)
     if pkg.get("build", {}).get("skip_host", True):
         env["SKIP_HOST"] = ""
+    
+    cflags=args.cflags + " " + pkg.get("build", {}).get("cflags", "")
+    ldflags=args.ldflags + " " + pkg.get("build", {}).get("ldflags", "")
 
     try:
         subprocess.run(
@@ -146,9 +149,9 @@ def compile(path: Path, srcpath: Path, pkg: Dict[str, Any], args):
                 "pyodide_build",
                 "pywasmcross",
                 "--cflags",
-                args.cflags + " " + pkg.get("build", {}).get("cflags", ""),
+                cflags,
                 "--ldflags",
-                args.ldflags + " " + pkg.get("build", {}).get("ldflags", ""),
+                ldflags,
                 "--host",
                 args.host,
                 "--target",

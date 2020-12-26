@@ -210,7 +210,8 @@ def handle_command(line, args, dryrun=False):
     emcc test.c
     ['emcc', 'test.c']
     """
-
+    if line[0]=='ld':
+      print(f"LINKING WOOO\n{line}\n***********************************\n")
     # This is a special case to skip the compilation tests in numpy that aren't
     # actually part of the build
     for arg in line:
@@ -265,7 +266,7 @@ def handle_command(line, args, dryrun=False):
         #ignore libraries
         skipLib=False
         for l in args.ignore_libs.strip().split(";"):
-          if arg.startswith("-l"+l):
+          if len(l)>0 and arg.startswith("-l"+l):
             skipLib=True
         if skipLib:
           continue
@@ -354,6 +355,8 @@ def handle_command(line, args, dryrun=False):
                 break
         if not dryrun:
             os.rename(output, renamed)
+    print(f"****************PYWASMCROSS:{new_args}\n**************")
+
     return new_args
 
 

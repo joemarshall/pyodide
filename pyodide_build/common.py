@@ -5,7 +5,7 @@ from typing import Optional, Set
 ROOTDIR = Path(__file__).parents[1].resolve() / "emsdk/emsdk/upstream/emscripten/tools"
 HOSTPYTHON = ROOTDIR / ".." / "cpython" / "build" / "3.8.2" / "host"
 TARGETPYTHON = ROOTDIR / ".." / "cpython" / "installs" / "python-3.8.2"
-DEFAULTCFLAGS = ""
+DEFAULTCFLAGS = "-fPIC"
 # fmt: off
 DEFAULTLDFLAGS = " ".join(
     [
@@ -17,8 +17,8 @@ DEFAULTLDFLAGS = " ".join(
         "--memory-init-file", "0",
         "-s", "LINKABLE=1",
         "-s", "EXPORT_ALL=1",
-        "-s",EMULATE_FUNCTION_POINTER_CASTS=1
-#        "-s", "ERROR_ON_MISSING_LIBRARIES=0",
+        "-s","EMULATE_FUNCTION_POINTER_CASTS=1",
+#        "-s", "ERROR_ON_MISSING_LIBRARIES=0",# this can't be used any more
     ]
 )
 # fmt: on

@@ -134,7 +134,7 @@ $(BUILD)/Makefile: $(BUILD)/.patched $(ZLIBBUILD)/.patched $(SQLITEBUILD)/libsql
 	( \
 		cd $(BUILD); \
 		CONFIG_SITE=./config.site READELF=true LD_RUN_PATH="$(SQLITEBUILD):$(BZIP2BUILD)" emconfigure \
-		   ./configure CFLAGS="$(EMMAKEN_CFLAGS)"\
+		   ./configure CFLAGS="$(EMMAKEN_CFLAGS)" LDFLAGS="-g4"\
 			  --without-pymalloc \
 			  --disable-shared \
 			  --disable-ipv6 \

@@ -21,8 +21,8 @@ SHELL := /bin/bash
 CC=emcc
 CXX=em++
 OPTFLAGS=-O2
-CFLAGS=$(OPTFLAGS) -g4 -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths -fPIC -s LZ4=1
-CXXFLAGS=$(CFLAGS) -std=c++14 -fPIC -s LZ4=1
+CFLAGS=$(OPTFLAGS) -g4 -I$(PYTHONINCLUDE) -Wno-warn-absolute-paths -fPIC -s LZ4=1 -s EMULATE_FUNCTION_POINTER_CASTS=1
+CXXFLAGS=$(CFLAGS) -std=c++14 -fPIC -s LZ4=1 -s EMULATE_FUNCTION_POINTER_CASTS=1
 
 
 LDFLAGS=\
@@ -31,7 +31,6 @@ LDFLAGS=\
 	$(CPYTHONROOT)/installs/python-$(PYVERSION)/lib/libpython$(PYMINOR).a \
 	$(LZ4LIB) \
 	-s "BINARYEN_METHOD='native-wasm'" \
-	-s TOTAL_MEMORY=10485760 \
 	-s ALLOW_MEMORY_GROWTH=1 \
 	-s MAIN_MODULE=1 \
 	-s LINKABLE=1 \
@@ -42,6 +41,7 @@ LDFLAGS=\
 	-s USE_FREETYPE=1 \
 	-s USE_LIBPNG=1 \
 	-std=c++14 \
+        --source-map-base / \
 	-L$(wildcard $(CPYTHONROOT)/build/sqlite*/.libs) -lsqlite3 \
 	$(wildcard $(CPYTHONROOT)/build/bzip2*/libbz2.a) \
 	-lstdc++ \
@@ -80,7 +80,7 @@ build/pyodide.asm.js: src/main.o src/type_conversion/jsimport.o \
 		src/type_conversion/pyimport.o src/type_conversion/pyproxy.o \
 		src/type_conversion/python2js.o \
 		src/type_conversion/python2js_buffer.o \
-		src/type_conversion/runpython.o src/type_conversion/hiwire.o
+		src/type_conversion/runpython.o src/type_conversion/hiwire.o root/.built
 	date +"[%F %T] Building pyodide.asm.js..."
 	[ -d build ] || mkdir build
 	$(CXX) -s EXPORT_NAME="'pyodide'" -o build/pyodide.asm.js $(filter %.o,$^) -g4 \
@@ -154,6 +154,7 @@ clean:
 	rm -fr root
 	rm -fr build/*
 	rm -fr src/*.bc
+	rm -fr src/*.o
 	make -C packages clean
 	make -C packages/six clean
 	make -C packages/jedi clean
