@@ -24,7 +24,7 @@ source:
 
 build:
   cflags: -s USE_FREETYPE=1 -s USE_LIBPNG=1 -s USE_ZLIB=1
-  ldflags: ../../../../emsdk/emsdk/.emscripten_cache/wasm-pic/libpng.a
+  ldflags: -s USE_FREETYPE=1 -s USE_LIBPNG=1 -s USE_ZLIB=1
   ignore-libs: png16
   post: |
     wget -O $SITEPACKAGES/matplotlib/mpl-data/fonts/ttf/Humor-Sans.ttf http://antiyawn.com/uploads/Humor-Sans-1.0.ttf
