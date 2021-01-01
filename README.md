@@ -4,6 +4,8 @@
   </a>
 </div>
 
+Joe Marshall: this repo is pyodide ported to upstream emscripten 2.0.9, slightly hackily, am working to help with proper updates to pyodide itself based on this work.
+
 
 [![Build Status](https://circleci.com/gh/iodide-project/pyodide.png)](https://circleci.com/gh/iodide-project/pyodide)
 [![Documentation Status](https://readthedocs.org/projects/pyodide/badge/?version=latest)](https://pyodide.readthedocs.io/?badge=latest)
