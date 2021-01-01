@@ -20,5 +20,5 @@ export PYTHONINCLUDE=$(PYODIDE_ROOT)/cpython/installs/python-$(PYVERSION)/includ
 export PYODIDE_PACKAGE_ABI=1
 # CFLAGS for EMCC only - make function pointers work even if the return type is wrong (as C does and cpython assumes)
 # and position independent code (needed for WASM)
-export EMMAKEN_CFLAGS = -s EMULATE_FUNCTION_POINTER_CASTS=1 -fPIC -s ASSERTIONS=1  -g4
-export EMCC_CFLAGS=  -s EMULATE_FUNCTION_POINTER_CASTS=1 -fPIC -s ASSERTIONS=1  -g4
+export EMMAKEN_CFLAGS = -s EMULATE_FUNCTION_POINTER_CASTS=1 -fPIC -s ASSERTIONS=1  
+export EMCC_CFLAGS=  -s EMULATE_FUNCTION_POINTER_CASTS=1 -fPIC -s ASSERTIONS=1 

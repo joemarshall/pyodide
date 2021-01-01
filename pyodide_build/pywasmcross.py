@@ -122,11 +122,6 @@ def capture_compile(args):
 
     env["PATH"] = str(ROOTDIR) + ":" + os.environ["PATH"] 
 
-    cmd = [Path(args.host) / "bin" / "python3", "-c", "import sysconfig;print(sysconfig.get_paths())"]
-    result = subprocess.run(cmd, env=env)
-
-
-
     cmd = [Path(args.host) / "bin" / "python3", "setup.py", "install"]
     if args.install_dir == "skip":
         cmd[-1] = "build"
@@ -172,6 +167,8 @@ def f2c(args, dryrun=False):
                 subprocess.check_call(
                     ["f2c", os.path.basename(filename)], cwd=os.path.dirname(filename)
                 )
+                cmd = [sys.executable, Path(__file__).parent.absolute() / "fix_f2c.py",arg[:-2]+".c"]
+                subprocess.check_call(cmd)
             new_args.append(arg[:-2] + ".c")
             found_source = True
         else:
@@ -210,8 +207,6 @@ def handle_command(line, args, dryrun=False):
     emcc test.c
     ['emcc', 'test.c']
     """
-    if line[0]=='ld':
-      print(f"LINKING WOOO\n{line}\n***********************************\n")
     # This is a special case to skip the compilation tests in numpy that aren't
     # actually part of the build
     for arg in line:
@@ -249,12 +244,13 @@ def handle_command(line, args, dryrun=False):
     lapack_dir = None
 
     extra_args=[]
+
     # Go through and adjust arguments
     for arg in line[1:]:
         if arg.startswith("-I"):
             if (
                 str(Path(arg[2:]).resolve()).startswith(args.host)
-                and "site-packages" not in arg
+                and "site-packages" not in arg 
             ):
                 arg = arg.replace("-I" + args.host, "-I" + args.target)
             # Don't include any system directories
@@ -263,8 +259,12 @@ def handle_command(line, args, dryrun=False):
         # Don't include any system directories
         if arg.startswith("-L/usr"):
             continue
+        # don't include any host libraries (need to specify their target build folder in the meta.yaml instead)
+        if arg.startswith("-L") and str(Path(arg[2:]).resolve()).startswith(args.host):
+            continue
         #ignore libraries
         skipLib=False
+        args.ignore_libs+=";gfortran"
         for l in args.ignore_libs.strip().split(";"):
           if len(l)>0 and arg.startswith("-l"+l):
             skipLib=True
@@ -355,7 +355,6 @@ def handle_command(line, args, dryrun=False):
                 break
         if not dryrun:
             os.rename(output, renamed)
-    print(f"****************PYWASMCROSS:{new_args}\n**************")
 
     return new_args
 

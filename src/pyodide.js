@@ -78,7 +78,7 @@ function loadPyodideMain(resolve,reject)
           if (Module['preloadedWasm'][path] === undefined) {
             promise = promise
               .then(() => Module['loadSideModule'](
-                FS.readFile(path), {loadAsync: true}))
+                FS.readFile(path), {loadAsync: true,allowUndefined:true}))
               .then((module) => {
                 Module['preloadedWasm'][path] = module;
               });
@@ -115,7 +115,7 @@ function loadPyodideMain(resolve,reject)
     // DFS to find all dependencies of the requested packages
     let packages = self.pyodide._module.packages.dependencies;
     let loadedPackages = self.pyodide.loadedPackages;
-    console.log("WOO",loadedPackages);    let queue = [].concat(names || []);
+    let queue = [].concat(names || []);
     let toLoad = {};
     while (queue.length) {
       let package_uri = queue.pop();

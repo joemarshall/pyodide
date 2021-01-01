@@ -22,11 +22,12 @@ source:
     - patches/skip-fortran-fails-to-link.patch
     - patches/skip_ellip_harm_2_pyx_ctypes.patch
     - patches/force_pyx_v2.patch
-    - patches/fix_cython_signatures.patch
+    - patches/make_subroutines_void.patch
 
 build:
-  cflags: -I../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration
+  cflags: -I../../../CLAPACK/CLAPACK-WA/INCLUDE -Wno-implicit-function-declaration 
   cxxflags:
+  ldflags: -L../../../numpy/build/numpy-1.15.4/install/lib/python3.8/site-packages/numpy/core/lib/
 
 requirements:
   run:

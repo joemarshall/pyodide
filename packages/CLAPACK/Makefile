@@ -34,4 +34,6 @@ $(SRC)/Makefile:
 		cd $(SRC); \
 		(cat ../patches/*.patch | patch -p1) \
 	)
+	find $(SRC) -name *.c -exec python ../../pyodide_build/fix_f2c.py {} \+
+	find $(SRC) -name *.h -exec python ../../pyodide_build/fix_f2c.py {} \+
 	touch $(SRC)/F2CLIBS/libf2c/arith.h

@@ -65,13 +65,13 @@ EM_JS(int, runpython_init_js, (), {
 
   Module.runPython = function(code)
   {
-    var pycode = allocate(intArrayFromString(code), 'i8', ALLOC_NORMAL);
+    var pycode = allocate(intArrayFromString(code), ALLOC_NORMAL);
     return Module._runPythonInternal(pycode);
   };
 
   Module.runPythonAsync = function(code, messageCallback, errorCallback)
   {
-    var pycode = allocate(intArrayFromString(code), 'i8', ALLOC_NORMAL);
+    var pycode = allocate(intArrayFromString(code), ALLOC_NORMAL);
 
     var idimports = Module.__findImports(pycode);
     var jsimports = Module.hiwire_get_value(idimports);

@@ -3,8 +3,8 @@ from typing import Optional, Set
 
 
 ROOTDIR = Path(__file__).parents[1].resolve() / "emsdk/emsdk/upstream/emscripten/tools"
-HOSTPYTHON = ROOTDIR / ".." / "cpython" / "build" / "3.8.2" / "host"
-TARGETPYTHON = ROOTDIR / ".." / "cpython" / "installs" / "python-3.8.2"
+HOSTPYTHON =  Path(__file__).parents[1].resolve() / "cpython" / "build" / "3.8.2" / "host"
+TARGETPYTHON = Path(__file__).parents[1].resolve() / "cpython" / "installs" / "python-3.8.2"
 DEFAULTCFLAGS = "-fPIC"
 # fmt: off
 DEFAULTLDFLAGS = " ".join(
