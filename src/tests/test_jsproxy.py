@@ -379,13 +379,14 @@ def test_await_fetch(selenium):
         """
     )
     time.sleep(0.1)
-    msg = "StopIteration: <!doctype html>"
-    with pytest.raises(selenium.JavascriptException, match=msg):
-        selenium.run(
-            """
+    selenium.run(
+        """
+        try:
             c.send(r2.result())
-            """
-        )
+        except StopIteration as value:
+            assert value.args[0].startswith("<!doctype html>")
+        """
+    )
 
 
 def test_await_error(selenium):
