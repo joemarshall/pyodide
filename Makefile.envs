@@ -1,5 +1,5 @@
 export PYVERSION ?= 3.10.2
-export PYODIDE_EMSCRIPTEN_VERSION ?= 2.0.27
+export PYODIDE_EMSCRIPTEN_VERSION ?= 3.1.8
 
 export PLATFORM_TRIPLET=wasm32-emscripten
 
@@ -44,7 +44,7 @@ export PYODIDE=1
 # This is the legacy environment variable used for the aforementioned purpose
 export PYODIDE_PACKAGE_ABI=1
 
-export DBGFLAGS=-g0
+export DBGFLAGS=-g0 
 # export DBGFLAGS=-g3 -gseparate-dwarf -sSEPARATE_DWARF_URL=http://localhost:8001/
 
 export OPTFLAGS=-O2
@@ -73,6 +73,7 @@ export MAIN_MODULE_LDFLAGS= $(LDFLAGS_BASE) \
 	-s MAIN_MODULE=1 \
 	-s EXPORT_NAME="'_createPyodideModule'" \
 	-s EXPORTED_FUNCTIONS='["___cxa_guard_acquire", "__ZNSt3__28ios_base4initEPv", "_main"]' \
+	-s LLD_REPORT_UNDEFINED=1 \
 	-s EXCEPTION_CATCHING_ALLOWED=['we only want to allow exception handling in side modules'] \
 	-s DEMANGLE_SUPPORT=1 \
 	-s USE_FREETYPE=1 \

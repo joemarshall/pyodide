@@ -99,8 +99,8 @@ $(INSTALL)/lib/libsqlite3.a: $(SQLITETARBALL)
 	# as a CPPFLAG
 	( \
 		cd $(SQLITEBUILD); \
-		emconfigure ./configure CFLAGS="$(PYTHON_CFLAGS)" CPPFLAGS="-DSQLITE_OMIT_POPEN"; \
-		emmake make -j $${PYODIDE_JOBS:-3}; \
+		emconfigure ./configure CFLAGS="$(PYTHON_CFLAGS)" --host wasm32 ;\
+		emmake make -j $${PYODIDE_JOBS:-3} libsqlite3.la; \
 	)
 	mkdir -p $(INSTALL)/lib/
 	cp $(SQLITEBUILD)/.libs/libsqlite3.a $(INSTALL)/lib/libsqlite3.a
